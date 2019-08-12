@@ -1,0 +1,229 @@
+<html>
+<meta charset="UTF-8">
+
+<head>
+    <title> Painel | chamado </title>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+    <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">
+
+    <!-- Compiled and minified JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
+
+    <style>
+        label {
+            color: white;
+        }
+    </style>
+</head>
+
+<body style="background-color: rgba(31, 178, 72,1)">
+    <br>
+
+    <div class="container">
+
+
+        <div class="row">
+            <div class="col s6">
+                <div class="card orange">
+
+                    <div style="text-align: center; padding-top: 20px; text-transform: uppercase">
+                        <span class="card-title white-text" style="font-size: 50px;font-weight: bold; ">SENHAS</span>
+                    </div>
+                    <div class="card-content">
+                        <div class="row">
+
+                            <div class="col s6">
+                                <label>Local</label>
+                                <select name="local" id="local" class="browser-default">
+                                    <!-- <option value="" disabled selected>Escolha Uma opção:</option>> -->
+                                    <option value="Mesa">Mesa</option>
+                                    <option value="Escritório">Escritorio</option>
+                                    <option value="Sala">Sala</option>
+                                </select>
+
+                            </div>
+                            <div class="col s6">
+                                <label>Numero</label>
+                                <select id="numero" name="numero" class="browser-default">
+
+                                    <option value="01">01</option>
+                                    <option value="02">02</option>
+                                    <option value="03">03</option>
+                                    <option value="04">04</option>
+                                    <option value="05">05</option>
+                                    <option value="06">06</option>
+                                    <option value="07">07</option>
+                                    <option value="08">08</option>
+                                    <option value="09">09</option>
+                                    <option value="10">10</option>
+                                </select>
+
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col s12">
+                                <style>
+                                    .switch label input[type=checkbox]:checked+.lever:after {
+                                        background-color: #e65100;
+                                    }
+
+                                    .switch label input[type=checkbox]:checked+.lever {
+                                        background-color: red;
+                                    }
+                                </style>
+                                <div class="switch">
+                                    <label>
+                                        Desligar
+                                        <input type="checkbox" id="switch">
+                                        <span class="lever"></span>
+                                        Ligar
+                                    </label>
+
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col s12">
+                                <a id="btn" class="waves-effect waves-light btn orange darken-4" style="width: 100%;"
+                                    onclick="chamarProximo()">Chamar
+                                    Próximo!</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col s6">
+                <div class="card yellow">
+                    <div style="padding-top: 10px;  text-align: center; text-transform: uppercase; ">
+                        <span style="font-size: 30px; color:gray;">Meus Chamados</span>
+                    </div>
+                    <ul class="collection with-header">
+
+
+                    </ul>
+
+                </div>
+            </div>
+
+
+        </div>
+        <div class="row">
+
+            <div class="col s4">
+
+                <div class="card">
+                    <div style="padding-top: 20px;  text-align: center; text-transform: uppercase; ">
+                        <span style="font-size: 20px; color:gray;">Setar Senha</span>
+                    </div>
+                    <div class="card-content">
+                        <input id="setarSenha" type="number" min="0" class="validate">
+                        <a id="btnSetar" class="waves-effect waves-light btn green darken-4" style="width: 100%;"
+                            onclick="setarSenha()">Setar!</a>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+
+    </div>
+</body>
+
+<script src="http://192.168.0.16:3000/socket.io/socket.io.js"></script>
+<script>
+    var socket = io.connect("http://192.168.0.16:3000");
+
+    var contador = 0;
+    socket.on('senhasUsuario', function (content) {
+        console.log(content);
+        $('.collection').prepend('<li class="collection-item" id="i' + contador + '">' + tempo() + ' >> <b>Senha:' + content + '</b></li>');
+
+
+        var localizar = "#i" + (contador - 6);
+        $(localizar).remove();
+        contador++;
+
+
+
+    });
+
+    $("#btn").addClass("disabled");
+    
+
+    $('#switch').change(function () {
+        var confirmar = $('#switch').is(":checked");
+
+        if (confirmar === true) {
+            $("#numero").prop("disabled", true);
+            $("#local").prop("disabled", true);
+            $("#btn").removeClass("disabled");
+            socket.emit("entrar", 'Local : ' + $('#local').val() + $('#numero').val());
+        } else {
+            $("#numero").prop("disabled", false);
+            $("#local").prop("disabled", false);
+            $("#btn").addClass("disabled");
+        }
+    });
+
+
+
+    function setarSenha() {
+        var valorSenha = $('#setarSenha').val();
+        $("#btnSetar").addClass("disabled");
+        $("#btnSetar").text('Aguarde!');
+
+        if( valorSenha.length  > 0){
+            socket.emit("setarSenha", parseInt(valorSenha));
+        }
+        setTimeout(function () {
+            $("#btnSetar").removeClass("disabled");
+            $("#btnSetar").text('Setar!');
+        }, 5000);
+    }
+
+    function chamarProximo() {
+        local = $('#local').val();
+        numero = $('#numero option:selected').val();
+        $("#btn").addClass("disabled");
+        $("#btn").text('Aguarde...');
+        $("#switch").prop("disabled", true);
+
+        setTimeout(function () {
+            $("#btn").removeClass("disabled");
+            $("#switch").prop("disabled", false);
+            $("#btn").text('Chamar próximo!');
+        }, 3000);
+        socket.emit("proximo", local + ' ' + numero, 0);
+
+
+
+    }
+
+    $(document).ready(function () {
+        console.log('ready');
+
+
+
+
+    });
+
+    function tempo() {
+        var d = new Date(), displayDate;
+        if (navigator.userAgent.toLowerCase().indexOf('firefox') > -1) {
+            displayDate = d.toLocaleTimeString('pt-BR');
+        } else {
+            displayDate = d.toLocaleTimeString('pt-BR', { timeZone: 'America/sao_paulo' });
+        }
+        return displayDate;
+    }
+
+
+</script>
+
+</html>

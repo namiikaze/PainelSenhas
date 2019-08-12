@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Simple chat</title>
+
+    <style>
+        body {
+            margin: 0px;
+            padding: 0px;
+            background: #ededed;
+            font-family: 'Arial', sans-serif;
+            font-size: 13px;
+        }
+
+        #logo {
+            text-align: center;
+
+        }
+
+        #logo .titulo {
+
+            color: white;
+            font-size: 40px;
+
+        }
+
+        #logo #dataTime {
+            color: whitesmoke;
+            font-size: 25px;
+
+        }
+
+        .menu {
+            overflow: hidden;
+            height: 150px;
+            top: 0px;
+            left: 0px;
+            right: 0px;
+            width: 100%;
+            padding-top: 30px;
+
+            padding-right: 15px;
+            background: rgb(0, 0, 0);
+            z-index: 100;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.css">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
+    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/css/materialize.min.css'>
+    <link rel='stylesheet' href='https://fonts.googleapis.com/icon?family=Material+Icons'>
+    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css'>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.css">
+
+
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js'></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/js/materialize.min.js'></script>
+
+    <script src="./script.js"></script>
+
+</head>
+
+<body>
+
+
+    <div class="menu">
+        <div id="logo">
+            <span class="titulo">PAINEL DE SENHAS</span>
+            <div style="text-align: right;margin-top:20px;"><span id="dataTime"></span></div>
+        </div>
+
+
+
+    </div>
+
+    <style>
+        li.alinhado {
+            text-align: center;
+            list-style-type: none;
+        }
+
+        .atual .label {
+            font-size: 30px;
+            text-transform: uppercase;
+        }
+
+        .atual .labelSenha {
+            font-size: 60px;
+            color: red;
+            font-weight: bold;
+        }
+
+        .antigas .labelSenha {
+            font-size: 30px;
+            margin-right: 160px;
+        }
+
+        .antigas .label {
+            font-size: 20px;
+            text-transform: uppercase;
+
+        }
+
+        .antigas .titulo {
+            font-size: 20px;
+            text-transform: uppercase;
+            text-align: center;
+            font-weight: bolder;
+        }
+    </style>
+
+
+    <div class="row">
+        <div class="col s5">
+
+            <div class="card" style="height: 300px;background-color:black;">
+                <div class="card-content white-text antigas">
+                    <li class="alinhado"><span class="titulo"> Últimas chamadas</span></li>
+
+                    <li class="alinhado"><span class="labelSenha" id="antiga01Senha"> </span>
+                        <span class="label" id="antiga01Mesa"></span></li>
+                    <hr>
+                    <li class="alinhado"><span class="labelSenha" id="antiga02Senha"> </span>
+                        <span class="label" id="antiga02Mesa"> </span></li>
+                    <hr>
+                    <li class="alinhado"><span class="labelSenha" id="antiga03Senha"> </span>
+                        <span class="label" id="antiga03Mesa"> </span></li>
+                    <hr>
+                    <li class="alinhado"><span class="labelSenha" id="antiga04Senha"> </span>
+                        <span class="label" id="antiga04Mesa"> </span></li>
+                </div>
+
+            </div>
+
+        </div>
+        <div class="col s7">
+            <div class="card principal" style="height: 300px;background-color:black;">
+                <div class="card-content white-text atual">
+                    <li class="alinhado"> <span class="label">SENHA NÚMERO:</span> </li>
+                    <li class="alinhado"><span class="labelSenha" id="principalSenha">0</span></li>
+                    <li class="alinhado"><span class="label">Dirija-se para: </span> </li>
+                    <li class="alinhado"><span class="labelSenha" id="principalMesa"> 0 </span> </li>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+
+    <div class="row" style="margin-top: -20px;">
+
+
+        <iframe src="https://mtsrangel.com/other/cdc/painel_noticias/" width="100%" height="480" allowfullscreen></iframe>
+
+    </div>
+</body>
+
+
+<script src="http://192.168.0.16:3000/socket.io/socket.io.js"></script>
+
+<script>
+
+
+    $(document).ready(function () {
+        var socket = io.connect("http://192.168.0.16:3000");
+
+
+
+
+
+        socket.on('senhas', function (senhas) {
+
+
+            reset();
+            $(".principal").animate({ marginLeft: "-=50px" }, 100);
+            $(".principal").animate({ marginRight: "-=50px" }, 100);
+
+            $(".principal").animate({ marginLeft: "+=100px" }, 100);
+            $(".principal").animate({ marginRight: "+=100px" }, 100);
+
+            $(".principal").animate({ marginLeft: "-=50px" }, 100);
+            $(".principal").animate({ marginRight: "-=50px" }, 100);
+
+            $('#principalSenha').text(senhas['principal']['senha']);
+            $('#principalMesa').text(senhas['principal']['mesa']);
+
+            if (senhas['antigas1']['senha'] != null) {
+                $('#antiga01Mesa').text(" " + senhas['antigas1']['mesa']);
+                $('#antiga01Senha').text("SENHA: " + senhas['antigas1']['senha']);
+            }
+
+            if (senhas['antigas2']['senha'] != null) {
+                $('#antiga02Mesa').text(" " + senhas['antigas2']['mesa']);
+                $('#antiga02Senha').text("SENHA: " + senhas['antigas2']['senha']);
+            }
+            if (senhas['antigas3']['senha'] != null) {
+                $('#antiga03Mesa').text(" " + senhas['antigas3']['mesa']);
+                $('#antiga03Senha').text("SENHA: " + senhas['antigas3']['senha']);
+            }
+            if (senhas['antigas4']['senha'] != null) {
+                $('#antiga04Mesa').text(" " + senhas['antigas4']['mesa']);
+                $('#antiga04Senha').text("SENHA: " + senhas['antigas4']['senha']);
+            }
+        });
+
+    });
+
+    function reset() {
+        $('#antiga01Mesa').text(" ");
+        $('#antiga01Senha').text(" ");
+
+        $('#antiga02Mesa').text(" ");
+        $('#antiga02Senha').text(" ");
+
+        $('#antiga03Mesa').text(" ");
+        $('#antiga03Senha').text(" ");
+
+        $('#antiga04Mesa').text(" ");
+        $('#antiga04Senha').text(" ");
+
+        $('#principalSenha').text(" ");
+        $('#principalMesa').text(" ");
+    }
+
+
+    var myVar = setInterval(myTimer, 1000);
+    function myTimer() {
+        var d = new Date(), displayDate;
+        if (navigator.userAgent.toLowerCase().indexOf('firefox') > -1) {
+            displayDate = d.toLocaleTimeString('pt-BR');
+        } else {
+            displayDate = d.toLocaleTimeString('pt-BR', { timeZone: 'America/Belem' });
+        }
+        document.getElementById("dataTime").innerHTML = displayDate;
+    }
+
+
+</script>
+
+
+</html>
