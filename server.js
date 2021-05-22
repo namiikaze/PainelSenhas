@@ -5,24 +5,9 @@ var http = require('http');
 var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
-const mysql = require('mysql');
-
-var ip = require('ip');
 
 
-const connection = mysql.createConnection({
-    host: '127.0.0.1',
-    port: 3306,
-    user: 'root',
-    password: '',
-    database: 'painel_senhas'
-});
 
-connection.connect(function (err) {
-    if (err) return console.log(err);
-    console.log('MYSQL Conectado com sucesso!');
-    console.log();
-});
 
 var senhaMesa = new Array('', '');
 var dados = null;
@@ -54,10 +39,10 @@ app.get('/', function (req, res) {
 
 app.use(express.static(__dirname + '/'));
 
-http.listen(3000, function () {
+http.listen(3001, function () {
 
     console.log('Sistema: Painel de Senha ');
-    console.log('Painel rodando em http://' + ip.address());
+    console.log('Painel rodando em http://');
 
 
 });
@@ -85,16 +70,7 @@ io.on("connection", function (socket) {
         
         console.log('Senha: '+ numeroSenha + ' | Local: '+ dados+ ' | ID Do usuario:' + idUsuario);
 
-        function insertBanco(conn) {
-
-            const sql = "INSERT INTO chamados (local,senha,idUsuario) values('"+dados+"','"+numeroSenha + "', "+idUsuario +" )";
-
-
-            conn.query(sql, function (error, results, fields) {
-                if (error) return console.log(error);
-            });
-        }
-        insertBanco(connection);
+       
         numeroSenha++;
         
     });
